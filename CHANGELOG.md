@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/buhairomka/products-api/compare/v0.0.4...v0.1.0) (2024-06-28)
+
+
+### Tests 🧪
+
+* tests done, preparing for deployment ([d9e4be3](https://github.com/buhairomka/products-api/commit/d9e4be329f7c0f212335220d6e798dbae1d9febd))
+
 ### [0.0.4](https://github.com/buhairomka/products-api/compare/v0.0.3...v0.0.4) (2024-06-28)
 
 
