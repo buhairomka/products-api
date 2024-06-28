@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post} from '@nestjs/common';
+import {Body, ConflictException, Controller, Get, Post} from '@nestjs/common';
 import {ApiCreatedResponse, ApiOkResponse, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {CategoriesService} from "./categories.service";
 import {CreateCategoryDto} from "./dto/create-category.dto";
@@ -13,7 +13,9 @@ export class CategoriesController {
     }
 
     @CreateCategoryDecorator()
-    create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
+    async create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
+        const isCategoryExist = await this.categoriesService.isExistCategory(createCategoryDto.name)
+        if (isCategoryExist) throw new ConflictException(`A category with name '${createCategoryDto.name}' already exists in db`)
         return this.categoriesService.create(createCategoryDto);
     }
 

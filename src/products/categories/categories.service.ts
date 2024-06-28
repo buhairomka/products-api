@@ -13,6 +13,7 @@ export class CategoriesService {
     }
 
     async create({name}:CreateCategoryDto){
+
         const category:Category = new Category()
         category.name = name
         return this.categoriesRepository.save(category);
@@ -25,5 +26,12 @@ export class CategoriesService {
 
     async findAll(){
         return await this.categoriesRepository.find()
+    }
+
+
+    async isExistCategory(name: string) {
+        return this.categoriesRepository.findOneBy({
+            name:name
+        });
     }
 }

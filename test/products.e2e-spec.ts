@@ -6,7 +6,7 @@ import {DataSource, Repository} from "typeorm";
 import {Category} from "../src/products/entities/category.entity";
 import {Product} from "../src/products/entities/product.entity";
 
-describe('AppController (e2e)', () => {
+describe('ProductsController (e2e)', () => {
     let app: INestApplication;
 
     let categoryRep: Repository<Category>
@@ -44,7 +44,6 @@ describe('AppController (e2e)', () => {
         categoryRep = dataSource.getRepository<Category>(Category)
         productRep = dataSource.getRepository<Product>(Product)
         testCategory = await categoryRep.save(category);
-        console.log('created test category:', testCategory)
     });
 
     describe('POST /products', () => {
