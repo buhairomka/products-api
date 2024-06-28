@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.3](https://github.com/buhairomka/products-api/compare/v0.0.2...v0.0.3) (2024-06-28)
+
+
+### Tests 🧪
+
+* **categories:** added tests for categories, still without auth ([bedb9c8](https://github.com/buhairomka/products-api/commit/bedb9c89dff3ab72c386b6508b3f50fcb7a57ff1))
+
 ### [0.0.2](https://github.com/buhairomka/products-api/compare/v0.0.1...v0.0.2) (2024-06-28)
 
 
