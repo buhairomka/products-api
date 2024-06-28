@@ -11,6 +11,7 @@ describe('CategoriesController (e2e)', () => {
     let createdCategory: Category;
     let categoryRep: Repository<Category>
 
+    let authToken: string;
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -23,12 +24,24 @@ describe('CategoriesController (e2e)', () => {
         const dataSource = app.get<DataSource>(DataSource)
         categoryRep = dataSource.getRepository<Category>(Category)
 
+        const authRes = await request(app.getHttpServer())
+            .get('/auth/token')
+            .expect(200)
+        authToken = authRes.body.token
     })
 
     describe('POST /categories',  () => {
+
+        it('should return 401 if unauthorized', async () => {
+            await request(app.getHttpServer())
+                .post(`/categories`)
+                .expect(401);
+        })
+
         it('should create a new category', async () => {
             const response = await request(app.getHttpServer())
                 .post('/categories')
+                .set('Token', `${authToken}`)
                 .send({name: 'TestingCategoriesCategory'} as CreateCategoryDto)
                 .expect(201);
 
@@ -45,6 +58,7 @@ describe('CategoriesController (e2e)', () => {
             // Assuming the category already exists
             const response = await request(app.getHttpServer())
                 .post('/categories')
+                .set('Token', `${authToken}`)
                 .send({name: createdCategory.name} as CreateCategoryDto)
                 .expect(409, new ConflictException(`A category with name '${createdCategory.name}' already exists in db`).getResponse())
 
@@ -53,6 +67,7 @@ describe('CategoriesController (e2e)', () => {
         it('should return 400 for validation errors', async () => {
             await request(app.getHttpServer())
                 .post('/categories')
+                .set('Token', `${authToken}`)
                 .send({
                     name: true,
                 })
@@ -66,9 +81,16 @@ describe('CategoriesController (e2e)', () => {
         });
     });
     describe('GET /categories', ()=>{
+        it('should return 401 if unauthorized', async () => {
+            await request(app.getHttpServer())
+                .get(`/categories`)
+                .expect(401);
+        })
+
         it('should return an array of categories', async () => {
             const response = await request(app.getHttpServer())
                 .get('/categories')
+                .set('Token', `${authToken}`)
                 .expect(200);
 
             expect(response.body).toEqual(expect.arrayContaining([

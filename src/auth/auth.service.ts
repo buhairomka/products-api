@@ -19,7 +19,7 @@ export class AuthService {
         };
 
         return {
-            token: this.jwtService.sign(payload, {secret: this.config.get('JWT_SECRET'),/* jwtid:payload.uuid*/}),
+            token: this.jwtService.sign(payload, {secret: this.config.get('JWT_SECRET')}),
             exp: payload.exp
         }
     }

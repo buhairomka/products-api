@@ -10,15 +10,16 @@ dotenvConfig({path: join(path, '.env')})
 
 const config = {
     type: "postgres",
-    host: `${process.env.POSTGRES_HOST}`,
-    port: +`${process.env.POSTGRES_PORT}`,
-    username: `${process.env.POSTGRES_USER}`,
-    password: `${process.env.POSTGRES_PASSWORD}`,
-    database: `${process.env.POSTGRES_DB}`,
+    // host: `${process.env.POSTGRES_HOST}`,
+    // port: +`${process.env.POSTGRES_PORT}`,
+    // username: `${process.env.POSTGRES_USER}`,
+    // password: `${process.env.POSTGRES_PASSWORD}`,
+    // database: `${process.env.POSTGRES_DB}`,
+    url: process.env.DATABASE_URL,
     entities: ['**/entities/**.entity.js'],
     // entities: [join(path, `${path.endsWith("migrations") ? ".." : "dist"}/entities/*entity.js`)],
     // migrations: [join(process.cwd(), `${!path.endsWith("migrations") ?'dist/migrations/':''}*.js`)],
-    logging: ['error'],
+    logging: 'all',
     autoLoadEntities: true,
     synchronize: true,
     // migrationsRun: true

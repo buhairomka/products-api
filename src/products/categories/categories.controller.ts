@@ -5,9 +5,11 @@ import {CreateCategoryDto} from "./dto/create-category.dto";
 import {Category} from "../entities/category.entity";
 import {CreateCategoryDecorator} from "./decorators/create-category.decorator";
 import {FindAllCategoriesDecorator} from "./decorators/find-all-categories.decorator";
+import {Auth} from "../../auth/auth.decorator";
 
 @ApiTags('Categories')
 @Controller('categories')
+@Auth()
 export class CategoriesController {
     constructor(private readonly categoriesService: CategoriesService) {
     }

@@ -16,10 +16,11 @@ import {FindAllProductsDecorator} from "./controller-decorators/find-all-product
 import {FindOneProductDecorator} from "./controller-decorators/find-one-product.decorator";
 import {UpdateProductDecorator} from "./controller-decorators/update-product.decorator";
 import {DeleteProductDecorator} from "./controller-decorators/delete-product.decorator";
+import {Auth} from "../auth/auth.decorator";
 
 @ApiTags('Products')
 @Controller('products')
-// @Auth()
+@Auth()
 export class ProductsController {
     constructor(private readonly productsService: ProductsService) {
     }

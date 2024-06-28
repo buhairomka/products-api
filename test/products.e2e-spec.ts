@@ -1,5 +1,5 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {BadRequestException, HttpException, INestApplication, ValidationPipe} from '@nestjs/common';
+import {BadRequestException, INestApplication, ValidationPipe} from '@nestjs/common';
 import * as request from 'supertest';
 import {AppModule} from './../src/app.module';
 import {DataSource, Repository} from "typeorm";
@@ -24,7 +24,7 @@ describe('ProductsController (e2e)', () => {
         categoryId: undefined
     });
     let testCategory: Category;
-
+    let authToken;
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -44,12 +44,38 @@ describe('ProductsController (e2e)', () => {
         categoryRep = dataSource.getRepository<Category>(Category)
         productRep = dataSource.getRepository<Product>(Product)
         testCategory = await categoryRep.save(category);
+
+
+        const authRes = await request(app.getHttpServer())
+            .get('/auth/token')
+            .expect(200)
+        authToken = authRes.body.token
     });
 
     describe('POST /products', () => {
+        it('should return 401 if unauthorized', async () => {
+            await request(app.getHttpServer())
+                .post('/products')
+                .send({
+                    name: '',
+                    description: '',
+                    price: -100,
+                    categoryId: 'invalid'
+                })
+                .expect(401);
+        })
+
+        it('should return 401 if unauthorized, in case not valid token', async () => {
+            await request(app.getHttpServer())
+                .post(`/products`)
+                .set('Token','beliberdablablablablablatokensupergood')
+                .expect(401);
+        })
+
         it('should create a new product', async () => {
             const response = await request(app.getHttpServer())
                 .post('/products')
+                .set('Token', `${authToken}`)
                 .send(Object.assign(productToSend(), {categoryId: testCategory.id}))
                 .expect(201);
 
@@ -71,6 +97,7 @@ describe('ProductsController (e2e)', () => {
         it('should return 400 if category does not exist', async () => {
             await request(app.getHttpServer())
                 .post('/products')
+                .set('Token', `${authToken}`)
                 .send({
                     name: 'Laptop',
                     description: 'Very cool gaming laptop',
@@ -89,6 +116,7 @@ describe('ProductsController (e2e)', () => {
             // Assuming the product already exists
             await request(app.getHttpServer())
                 .post('/products')
+                .set('Token', `${authToken}`)
                 .send(Object.assign(productToSend(), {categoryId: testCategory.id}))
                 .expect(409, {
                     statusCode: 409,
@@ -100,6 +128,7 @@ describe('ProductsController (e2e)', () => {
         it('should return 400 for validation errors', async () => {
             await request(app.getHttpServer())
                 .post('/products')
+                .set('Token', `${authToken}`)
                 .send({
                     name: '',
                     description: '',
@@ -121,9 +150,17 @@ describe('ProductsController (e2e)', () => {
     });
 
     describe('GET /products/:id', () => {
+
+        it('should return 401 if unauthorized', async () => {
+            await request(app.getHttpServer())
+                .get(`/products/${createdProduct.id}`)
+                .expect(401);
+        })
+
         it('should return a product', async () => {
             const response = await request(app.getHttpServer())
                 .get(`/products/${createdProduct.id}`)
+                .set('Token', `${authToken}`)
                 .expect(200);
 
             expect(response.body)
@@ -133,6 +170,7 @@ describe('ProductsController (e2e)', () => {
         it('should return 404 if product is not found', async () => {
             await request(app.getHttpServer())
                 .get('/products/999')
+                .set('Token', `${authToken}`)
                 .expect(404, {
                     statusCode: 404,
                     message: `Product with id #999 not found`,
@@ -143,6 +181,7 @@ describe('ProductsController (e2e)', () => {
         it('should return 400 if id is not a number', async () => {
             await request(app.getHttpServer())
                 .get('/products/invalid')
+                .set('Token', `${authToken}`)
                 .expect(400, {
                     statusCode: 400,
                     message: 'Validation failed (numeric string is expected)',
@@ -153,23 +192,39 @@ describe('ProductsController (e2e)', () => {
 
 
     describe('GET /products', () => {
+
+        it('should return 401 if unauthorized', async () => {
+            await request(app.getHttpServer())
+                .get(`/products`)
+                .expect(401);
+        })
+
         it('should return an array of products', async () => {
             const response = await request(app.getHttpServer())
                 .get('/products')
+                .set('Token', `${authToken}`)
                 .expect(200);
 
             // expect(response.body).toContain(createdProduct);
             expect(response.body).toEqual(expect.arrayContaining([
-                    expect.objectContaining(createdProduct)
-                ]))
+                expect.objectContaining(createdProduct)
+            ]))
         });
     });
 
 
     describe('PATCH /products/:id', () => {
+
+        it('should return 401 if unauthorized', async () => {
+            await request(app.getHttpServer())
+                .patch(`/products/1`)
+                .expect(401);
+        })
+
         it('should update a product', async () => {
             const response = await request(app.getHttpServer())
                 .patch(`/products/${createdProduct.id}`)
+                .set('Token', `${authToken}`)
                 .send({
                     name: 'Updated Laptop',
                     description: 'Updated description',
@@ -189,6 +244,7 @@ describe('ProductsController (e2e)', () => {
         it('should return 404 if product is not found', async () => {
             await request(app.getHttpServer())
                 .patch('/products/999999')
+                .set('Token', `${authToken}`)
                 .send({
                     name: 'Updated Laptop',
                     description: 'Updated description',
@@ -205,6 +261,7 @@ describe('ProductsController (e2e)', () => {
         it('should return 400 if category does not exists in db', async () => {
             await request(app.getHttpServer())
                 .patch(`/products/${createdProduct.id}`)
+                .set('Token', `${authToken}`)
                 .send({categoryId: 1847628341})
                 .expect(400, new BadRequestException(`Category with id ${1847628341} not found`).getResponse())
         });
@@ -212,6 +269,7 @@ describe('ProductsController (e2e)', () => {
         it('should return 400 for validation errors', async () => {
             await request(app.getHttpServer())
                 .patch('/products/1')
+                .set('Token', `${authToken}`)
                 .send({
                     name: true,
                     description: true,
@@ -235,15 +293,24 @@ describe('ProductsController (e2e)', () => {
 
 
     describe('DELETE /products/:id', () => {
+
+        it('should return 401 if unauthorized', async () => {
+            await request(app.getHttpServer())
+                .delete(`/products/1`)
+                .expect(401);
+        })
+
         it('should delete a product', async () => {
             await request(app.getHttpServer())
                 .delete(`/products/${createdProduct.id}`)
+                .set('Token', `${authToken}`)
                 .expect(204);
         });
 
         it('should return 404 if product is not found', async () => {
             await request(app.getHttpServer())
                 .delete('/products/999')
+                .set('Token', `${authToken}`)
                 .expect(404, {
                     statusCode: 404,
                     message: 'Product with ID 999 not found',
@@ -254,6 +321,7 @@ describe('ProductsController (e2e)', () => {
         it('should return 400 if id is not a number', async () => {
             await request(app.getHttpServer())
                 .delete('/products/invalid')
+                .set('Token', `${authToken}`)
                 .expect(400, {
                     statusCode: 400,
                     message: 'Validation failed (numeric string is expected)',
