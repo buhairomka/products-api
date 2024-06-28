@@ -84,5 +84,6 @@ describe('CategoriesController (e2e)', () => {
         } catch (e) {
             console.log(e)
         }
+        await app.close()
     })
 })

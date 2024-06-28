@@ -14,7 +14,7 @@ export class AuthService {
     async createToken(): Promise<{ token: string, exp: number }> {
         const payload = {
             uuid: randomUUID(),
-            iat: Date.now(),
+            iat: Math.floor(Date.now() / 1000),
             exp: Math.floor(Date.now() / 1000) + 60 * 5 // Токен дійсний 5 хв
         };
 

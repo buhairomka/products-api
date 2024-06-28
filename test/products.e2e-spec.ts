@@ -270,5 +270,6 @@ describe('ProductsController (e2e)', () => {
             console.log(e)
         }
 
+        await app.close()
     })
 });
