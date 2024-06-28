@@ -18,7 +18,7 @@ const config = {
     entities: ['**/entities/**.entity.js'],
     // entities: [join(path, `${path.endsWith("migrations") ? ".." : "dist"}/entities/*entity.js`)],
     // migrations: [join(process.cwd(), `${!path.endsWith("migrations") ?'dist/migrations/':''}*.js`)],
-    logging: 'all',
+    logging: ['error'],
     autoLoadEntities: true,
     synchronize: true,
     // migrationsRun: true

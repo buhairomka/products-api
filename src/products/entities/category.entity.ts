@@ -1,10 +1,11 @@
 import {Product} from "./product.entity";
-import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, Index, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
 
 @Entity()
+@Index('name_unique',['name'],{unique:true})
 export class Category {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({primaryKeyConstraintName:'category_pkey'})
     @ApiProperty({example:1})
     id: number;
 

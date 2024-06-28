@@ -58,6 +58,7 @@ export class ProductsController {
         if (result.affected === 0) {
             throw new NotFoundException(`Product with ID ${id} not found`);
         }
-        return new HttpException(`Product with id #${id} deleted`, 204)
+        throw new HttpException(null,204)
+
     }
 }

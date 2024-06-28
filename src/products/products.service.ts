@@ -7,6 +7,8 @@ import {Repository} from "typeorm";
 import {CategoriesService} from "./categories/categories.service";
 import {Category} from "./entities/category.entity";
 
+
+
 @Injectable()
 export class ProductsService {
 
@@ -37,6 +39,8 @@ export class ProductsService {
             .select([
                 "product.id",
                 "product.name",
+                "product.description",
+                "product.price",
                 "category.id",
                 "category.name"
             ])
@@ -45,9 +49,19 @@ export class ProductsService {
     }
 
     findOne(id: number) {
-        return this.productsRep.findOneBy({
-            id,
-        })
+        return this.productsRep
+            .createQueryBuilder("product")
+            .leftJoinAndSelect("product.category", "category")
+            .select([
+                "product.id",
+                "product.description",
+                "product.price",
+                "product.name",
+                "category.id",
+                "category.name"
+            ])
+            .where({id})
+            .getOne();
     }
 
     async update(id: number, updateProductDto: UpdateProductDto) {

@@ -2,6 +2,15 @@ import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique} f
 import {Category} from "./category.entity";
 import {ApiProperty} from "@nestjs/swagger";
 
+class ColumnNumericTransformer {
+    to(data: number): number {
+        return data;
+    }
+    from(data: string): number {
+        return parseFloat(data);
+    }
+}
+
 @Entity()
 @Unique('product_unique',['name','category'])
 export class Product {
@@ -18,7 +27,7 @@ export class Product {
     @ApiProperty({example:'Very cool gaming laptop'})
     description: string;
 
-    @Column({type: "decimal"})
+    @Column({type: "numeric",transformer:new ColumnNumericTransformer})
     @ApiProperty({example:'1500'})
     price: number;
 
@@ -27,3 +36,4 @@ export class Product {
     @JoinColumn({ name: "category_id" })
     category: Category;
 }
+
